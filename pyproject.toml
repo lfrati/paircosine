@@ -36,6 +36,8 @@ filterwarnings = [
     # https://github.com/numba/numba/issues/8095
     # https://github.com/gmarkall/numba/commit/215bcba66f4999ad3aa2ca746e4df9feac45c7d3
     'ignore:invalid escape sequence \\|:DeprecationWarning',
+    # https://numba.readthedocs.io/en/stable/reference/deprecation.html#expected-replacement
+    'ignore::numba.NumbaPendingDeprecationWarning'
 ]
 
 
