@@ -17,11 +17,11 @@ keywords = ["numerical"]
 dependencies = ["numpy", "numba", "tqdm"]
 requires-python = ">=3.9"
 
-    [project.scripts]
-        stega = "paircosine.__main__:main"
+    # [project.scripts]
+    #     paircos = "paircosine.__main__:main"
 
     [project.optional-dependencies]
-    dev = ["tqdm", "bumpver", "pip-tools", "build", "twine", "pytest"]
+    dev = ["bumpver", "pip-tools", "build", "twine", "pytest", "scipy"]
 
     [project.urls]
     Homepage = "https://github.com/lfrati/paircosine"
