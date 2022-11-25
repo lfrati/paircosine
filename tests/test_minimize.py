@@ -1,4 +1,4 @@
-from paircosine import *
+from subpair import *
 
 
 def test_min_subset():
@@ -23,7 +23,7 @@ def test_min_subset():
         for j in xs:
             distances[i, j] = -1
 
-    best, stats = select_best(distances, P=200, S=S, K=50, M=3, O=2, its=3_000)
+    best, _ = select_best(distances, P=200, S=S, K=50, M=3, O=2, its=3_000)
     # print("Final fit:", stats["fits"][-1])
 
     # import matplotlib.pyplot as plt
