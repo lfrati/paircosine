@@ -2,6 +2,10 @@ import math
 from numba import cuda, njit, float32
 import numpy as np
 
+# =============================================================================
+#                       Reference Implemenation
+# =============================================================================
+
 
 @njit("f4(f4[:], f4[:])")
 def cosine_distance(u: np.ndarray, v: np.ndarray):
@@ -23,7 +27,7 @@ def cosine_distance(u: np.ndarray, v: np.ndarray):
 # =============================================================================
 
 
-def pairwise_cosine(X):
+def pairwise_cosine_numpy(X):
     norms = np.einsum("ij,ij->i", X, X)
     np.sqrt(norms, norms)
     X /= norms[:, np.newaxis]
@@ -107,3 +111,12 @@ def pairwise_cosine_cuda(X):
     X /= norms[:, np.newaxis]
     dists = 1 - outer(X)
     return dists
+
+
+def pairwise_cosine(X, mode="numpy"):
+    if mode == "numpy":
+        return pairwise_cosine_numpy(X)
+    return pairwise_cosine(X)
+
+
+__all__ = ["pairwise_cosine", "cosine_distance"]

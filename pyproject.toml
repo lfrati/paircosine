@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "subpair"
-version = "0.2.1"
-description = "TODO"
+version = "0.0.1"
+description = "Fast pairwise cosine distance calculation and numba accelerated evolutionary matrix subset extraction "
 readme = "README.md"
 authors = [{ name = "lfrati", email = "lfrati.github@gmail.com" }]
 license = {text = "MIT"}
@@ -13,7 +13,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["numerical"]
+keywords = ["numpy", "numba", "evolution", "pairwise-cosine"]
 dependencies = ["numpy", "numba", "tqdm"]
 requires-python = ">=3.9"
 

@@ -6,8 +6,8 @@ from scipy.spatial.distance import cosine
 import pytest
 
 ATOL = 1e-6
-N = 31
-K = 10
+N = 65
+K = 20
 
 
 def scipy_cosine(v1, v2):
@@ -40,11 +40,11 @@ def test_cosine_distance():
     assert np.allclose(res, expected, atol=ATOL)
 
 
-def test_pairiwse(data):
-    res = pairwise_cosine(data["X"])
+def test_pairiwse_numpy(data):
+    res = pairwise_cosine(data["X"], mode="numpy")
     assert np.allclose(res, data["target"], atol=ATOL)
 
 
 def test_pairwise_cuda(data):
-    res = pairwise_cosine_cuda(data["X"])
+    res = pairwise_cosine(data["X"], mode="cuda")
     assert np.allclose(res, data["target"], atol=ATOL)

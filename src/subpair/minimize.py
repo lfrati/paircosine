@@ -99,13 +99,7 @@ def step(pop, fitnesses, P, S, K, M, O, space):
     return pop
 
 
-# distances : [N,L] N vectors of length L
-# P : population size
-# S : subset size
-# K : number of parents (P-K children)
-# M : number of mutations
-# O : fraction of crossovers e.g. O=2 -> 1/2, O=10 -> 1/10, (bigger=faster)
-def select_best(
+def extract(
     distances,
     P,
     S,
@@ -114,6 +108,25 @@ def select_best(
     O,
     its,
 ):
+    """Given a matrix of pairwise distances evolves the minimal subset of size S.
+    (minimal = sum of entries in the subset)
+
+    Note:
+        The input matrix is assumed to be symmetric but it's not checked. Beware.
+
+    Args:
+        distances (int, int) : [N,L] N vectors of length L
+        P (int): population size
+        S (int): subset size
+        K (int): number of parents (P-K children)
+        M (int): number of mutations
+        O (int): fraction of crossovers e.g. O=2 -> 1/2, O=10 -> 1/10, (bigger=faster)
+
+    Returns:
+       best (np.ndarray) : S indeces corresponding to the minimal subset found
+       stats (dict)      : stats["bests"] = best subset found at each iteration
+                           stats["fits"] = best fitness found at each iteration
+    """
     N = distances.shape[0]
     assert S <= N, f"Error: value of S={S} is > than the #distances={N}"
     assert O >= 1, f"Error: value of O={O} is < 1"
@@ -137,3 +150,6 @@ def select_best(
     best = np.copy(pop[np.argmin(fitnesses)])
 
     return best, stats
+
+
+__all__ = ["extract"]
