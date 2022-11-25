@@ -55,4 +55,4 @@ push = true
     'current_version = "{version}"',
     'version = "{version}"'
 ]
-"src/stegaplots/__init__.py" = ["{version}"]
+"src/subpair/__init__.py" = ["{version}"]
