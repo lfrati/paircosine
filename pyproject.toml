@@ -21,7 +21,8 @@ requires-python = ">=3.9"
     #     subpair = "subpair.__main__:main"
 
     [project.optional-dependencies]
-    dev = ["bumpver", "pip-tools", "build", "twine", "pytest", "scipy"]
+    dev = ["bumpver", "pip-tools", "build", "twine", "matplotlib", "ipython"]
+    testing = ["pytest", "scipy", "scikit-learn"]
 
     [project.urls]
     Homepage = "https://github.com/lfrati/subpair"

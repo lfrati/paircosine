@@ -3,13 +3,11 @@ from subpair import *
 
 def test_min_subset():
 
-    # N = 1000  # population size
-    # M = 20  # dna size
-    # k = 200  # how many get to fuck (out of N)
-
     N = 1024
-    distances = np.random.rand(N, N).astype(np.float32)
-    distances = np.maximum(distances, distances.transpose())
+    K = 512
+
+    X = np.random.rand(N, K).astype(np.float32)
+    distances = pairwise_cosine(X)
 
     # import matplotlib.pyplot as plt
     # plt.imshow(distances, interpolation="nearest")
@@ -23,7 +21,8 @@ def test_min_subset():
         for j in xs:
             distances[i, j] = -1
 
-    best, _ = select_best(distances, P=200, S=S, K=50, M=3, O=2, its=3_000)
+    print()
+    best, stats = select_best(distances, P=200, S=S, K=50, M=3, O=2, its=3_000)
     # print("Final fit:", stats["fits"][-1])
 
     # import matplotlib.pyplot as plt
@@ -32,6 +31,7 @@ def test_min_subset():
 
     missed = len(set(best).difference(set(xs)))
     accuracy = 1 - missed / len(best)
-    print(accuracy)
+
+    print("Accuracy:", accuracy)
 
     assert accuracy > 0.5
