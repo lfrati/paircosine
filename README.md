@@ -66,8 +66,7 @@ distances (int, int) : N vectors of length L
 
 # Note
 
-Given N vectors of size K compute the (N,N) pairwise cosine distance matrix.
-This repo contains both numpy and numba/CUDA versions of the pairwise cosine distance matrix calculation. But numpy is already _blazingly_ fast so the cuda version is provided mostly for inspiration. Our numpy version is very similar to sklearn's [metrics.pairwise.cosine_distances](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_distances.html) but slightly faster. Sklearn's one has some extra nicities that our simplified version has not.
+This repo contains both numpy and numba/CUDA versions of the pairwise cosine distance matrix calculation. But numpy is already _blazingly_ fast so the cuda version is provided mostly for inspiration. Our numpy version is very similar to sklearn's [metrics.pairwise.cosine_distances](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_distances.html) but slightly faster. Sklearn's one has some extra nicities that our simplified version does not have.
 
 ```bash
 > python flops.py # On Macbook pro M1 Max
