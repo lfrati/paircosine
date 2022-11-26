@@ -9,6 +9,31 @@
 
 Pairwise cosine distance is great to easily compare many vectors. However, you can end up with a very sizeable distance matrix. What if you would like to find a small subset of that matrix? Let's search it by evolution.
 
+Given N elements and their (N,N) pairwise distance matrix we would like to get the subset of S elements such that the sum of elements in the corresponding (S,S) submatrix is minimal. See example below.
+
+```
+  [0  1  2  3  4] indeces 
+      i  j     k    
+      │  │     │          i j k   = [1, 2, 4]
+   0  1  6  4  1                   
+i──1  0  3  1  7       i  0 3 7     
+j──6  3  0  2  3  -->  j  3 0 3  -->  7 + 3 + 3 = 13 👎
+   4  1  2  0  1       k  7 3 0
+k──1  7  3  1  0
+
+         i  j  k    
+         │  │  │          i j k  = [2, 3, 4]   
+   0  1  6  4  1                   
+   1  0  3  1  7       i  0 2 3     
+i──6  3  0  2  3  -->  j  2 0 1  -->  2 + 1 + 3 = 6 👍
+j──4  1  2  0  1       k  3 1 0
+k──1  7  3  1  0
+```
+
+All the possible subsets are ${N}\choose{S}$ and for N = 1024, S = 20 (like in the tests) we would have to check ${1024}\choose{20}$ $= 5.479 \times 10^{41}$ of them. 
+
+A few too many. Instead we are going to use an evolutionary approach to search for it.
+
 # Example usage
 
 The usage is quite straight forward since there are only a couple of functions exported `pairwise_cosine` and `extract`.
@@ -26,6 +51,7 @@ The usage is quite straight forward since there are only a couple of functions e
 ```
 <p align="left">
     <img width="500" alt="Logo" src="https://user-images.githubusercontent.com/3115640/204059389-730df61a-4e87-4023-b7c7-038b329dc6a6.png">
+    <p>(We have sprinkled a few negative numbers to see if the algorithm can find them)</p>
 </p>
 Where the options of extract are parameters for the evolutionary algorithm:
 
@@ -41,7 +67,7 @@ distances (int, int) : N vectors of length L
 # Note
 
 Given N vectors of size K compute the (N,N) pairwise cosine distance matrix.
-This repo contains both numpy and numba/CUDA versions but numpy is already _blazingly_ fast so the cuda version is provided mostly for inspiration.
+This repo contains both numpy and numba/CUDA versions of the pairwise cosine distance matrix calculation. But numpy is already _blazingly_ fast so the cuda version is provided mostly for inspiration. Our numpy version is very similar to sklearn's [metrics.pairwise.cosine_distances](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_distances.html) but slightly faster. Sklearn's one has some extra nicities that our simplified version has not.
 
 ```bash
 > python flops.py # On Macbook pro M1 Max
