@@ -14,7 +14,7 @@ def test_min_subset():
     # plt.imshow(distances, interpolation="nearest")
     # plt.show()
 
-    S = 16
+    S = 20
     locs = np.arange(N)
     np.random.shuffle(locs)
     xs = locs[:S]
@@ -28,6 +28,12 @@ def test_min_subset():
 
     # import matplotlib.pyplot as plt
     # plt.plot(stats["fits"])
+    # plt.grid()
+    # plt.ylabel("Subset distances")
+    # plt.xlabel("Iterations")
+    # plt.title("Minimal subset extraction (lower is better)")
+    # plt.tight_layout()
+    # plt.savefig("min_subset.png", dpi=300)
     # plt.show()
 
     missed = len(set(best).difference(set(xs)))
