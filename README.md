@@ -34,6 +34,20 @@ All the possible subsets are ${N}\choose{S}$ and for N = 1024, S = 20 (like in t
 
 A few too many. Instead we are going to use an evolutionary approach to search for it.
 
+# Installation
+Through pip:
+
+```bash
+pip install subpair
+```
+or github
+
+```bash
+git clone https://github.com/lfrati/subpair.git
+cd subpair
+pip install -e .
+```
+
 # Example usage
 
 The usage is quite straight forward since there are only a couple of functions exported `pairwise_cosine` and `extract`.
