@@ -49,12 +49,40 @@ def subset(matrix, cols):
 
 @njit
 def mutate(parent, valid, loci, M):
+    """
+    Args:
+        parent (np.ndarray): Gene to be mutated, a list of S selected indices.
+        valid (np.ndarray): List of indices within the whole matrix which can be chosen as replacements.
+        loci (np.ndarray): List of indices within `parent` that can be replaced.
+        M (int): Number of mutations.
+    """
     # how to mutate (only new values)
     mutations = choice(valid, size=M, replace=False)
     # where to mutate
     positions = choice(loci, size=M, replace=False)
     child = np.copy(parent)
     child[positions] = mutations
+    return child
+
+
+@njit
+def mutate_deterministic(parent, valid, distances):
+    """
+    Args:
+        parent (np.ndarray): Gene to be mutated, a list of S selected indices.
+        valid (np.ndarray): List of indices within the whole matrix which can be chosen as replacements.
+        distances (np.ndarray): distance matrix of shape [N,N]
+    """
+    to_replace = subset(distances, parent).sum(axis=0).argmax()
+    to_keep = list(parent[:to_replace]) + list(parent[to_replace+1:])
+    # Below, each row is an existing point and each column is a candidate new point to add to the set. Which candidate
+    # point has the lowest total distance to all the existing points?
+    candidates = distances[np.ix_(to_keep, valid)]
+    candidate_scores = candidates.sum(axis=0)
+    best_replacement = candidate_scores.argmin()
+    # proportional_choice = choice(valid, p=candidate_scores / candidate_scores.max())
+    child = np.copy(parent)
+    child[to_replace] = best_replacement
     return child
 
 
@@ -71,7 +99,25 @@ def score(pop, distances):
 
 
 @njit(parallel=True)
-def step(pop, fitnesses, P, S, K, M, O, space):
+def step(pop, fitnesses, P, S, K, M, O, R, space, distances):
+    """
+    Given a population and precomputed fitnesses, returns the next generation after selection, mutation, and crossover.
+
+    Args:
+        pop (np.ndarray) : array of shape [P, S]
+        fitnesses (np.ndarray) : array of shape [P], each value corresponding to a row of `pop`
+        P (int): population size
+        S (int): subset size (number of matrix columns to select)
+        K (int): number of parents (P-K children)
+        M (int): number of mutations per child
+        O (int): fraction of crossovers e.g. O=2 -> 1/2, O=10 -> 1/10, (bigger=faster)
+        R (float): probability of random mutation (as opposed to deterministic mutation)
+        space (set): The set of possible column indices: range(0 .. # columns).
+        distances (np.ndarray): distance matrix of shape [N,N]
+
+    Returns:
+       pop (np.ndarray) : the next generation, shape [P, S]
+    """
     indexes = np.argsort(fitnesses)
     fit_idxs = indexes[:K]
     unfit_idxs = indexes[K:]
@@ -86,7 +132,10 @@ def step(pop, fitnesses, P, S, K, M, O, space):
     ##### MUTATION ######
     for i in prange(P - K):
         j = i % K
-        children[i] = mutate(top_k[j], valid[j], loci, M)
+        if np.random.random() <= R:
+            children[i] = mutate(top_k[j], valid[j], loci, M)
+        else:
+            children[i] = mutate_deterministic(top_k[j], valid[j], distances)
 
     ##### CROSSOVER ######
     for i in prange(0, P - K - 1):
@@ -106,6 +155,7 @@ def extract(
     K,
     M,
     O,
+    R,
     its,
 ):
     """Given a matrix of pairwise distances evolves the minimal subset of size S.
@@ -115,12 +165,14 @@ def extract(
         The input matrix is assumed to be symmetric but it's not checked. Beware.
 
     Args:
-        distances (int, int) : [N,L] N vectors of length L
+        distances (np.ndarray): distance matrix of shape [N,N]
         P (int): population size
-        S (int): subset size
+        S (int): subset size (number of matrix columns to select)
         K (int): number of parents (P-K children)
-        M (int): number of mutations
+        M (int): number of mutations per child
         O (int): fraction of crossovers e.g. O=2 -> 1/2, O=10 -> 1/10, (bigger=faster)
+        R (float): probability of random mutation (as opposed to deterministic mutation)
+        its (int): number of generations to run evolution
 
     Returns:
        best (np.ndarray) : S indeces corresponding to the minimal subset found
@@ -138,7 +190,7 @@ def extract(
     stats = defaultdict(list)
     for _ in trange(its):
 
-        pop = step(pop, fitnesses, P, S, K, M, O, space)
+        pop = step(pop, fitnesses, P, S, K, M, O, R, space, distances)
 
         fitnesses = score(pop, distances)
 
