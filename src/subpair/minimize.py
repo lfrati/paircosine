@@ -66,6 +66,25 @@ def mutate(parent, valid, loci, M):
 
 
 @njit
+def numba_ix(arr, rows, cols):
+    """
+    Numba compatible implementation of arr[np.ix_(rows, cols)] for 2D arrays.
+    :param arr: 2D array to be indexed
+    :param rows: Row indices
+    :param cols: Column indices
+    :return: 2D array with the given rows and columns of the input array
+    """
+    one_d_index = np.zeros(len(rows) * len(cols), dtype=np.int32)
+    for i, r in enumerate(rows):
+        start = i * len(cols)
+        one_d_index[start: start + len(cols)] = cols + arr.shape[1] * r
+
+    arr_1d = arr.reshape((arr.shape[0] * arr.shape[1], 1))
+    slice_1d = np.take(arr_1d, one_d_index)
+    return slice_1d.reshape((len(rows), len(cols)))
+
+
+@njit
 def mutate_deterministic(parent, valid, distances):
     """
     Args:
@@ -73,16 +92,17 @@ def mutate_deterministic(parent, valid, distances):
         valid (np.ndarray): List of indices within the whole matrix which can be chosen as replacements.
         distances (np.ndarray): distance matrix of shape [N,N]
     """
-    to_replace = subset(distances, parent).sum(axis=0).argmax()
+    distgrid = numba_ix(distances, parent, parent)  # distances[np.ix_(parent, parent)]
+    to_replace = distgrid.sum(axis=0).argmax()
     to_keep = list(parent[:to_replace]) + list(parent[to_replace+1:])
     # Below, each row is an existing point and each column is a candidate new point to add to the set. Which candidate
     # point has the lowest total distance to all the existing points?
-    candidates = distances[np.ix_(to_keep, valid)]
+    candidates = numba_ix(distances, to_keep, valid)  # distances[np.ix_(to_keep, valid)]
     candidate_scores = candidates.sum(axis=0)
     best_replacement = candidate_scores.argmin()
     # proportional_choice = choice(valid, p=candidate_scores / candidate_scores.max())
     child = np.copy(parent)
-    child[to_replace] = best_replacement
+    child[to_replace] = valid[best_replacement]
     return child
 
 
@@ -124,10 +144,10 @@ def step(pop, fitnesses, P, S, K, M, O, R, space, distances):
     top_k = pop[fit_idxs]
     loci = np.arange(S)
     # compute valid indices to sample from during mutation
-    valid = np.empty((K, len(space) - S))
+    valid = np.empty((K, len(space) - S), dtype=pop.dtype)
     for i in prange(K):
         valid[i] = np.array(list(space - set(top_k[i])))
-    children = np.empty(((P - K), S))
+    children = np.empty(((P - K), S), dtype=pop.dtype)
 
     ##### MUTATION ######
     for i in prange(P - K):
