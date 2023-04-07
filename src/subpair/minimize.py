@@ -204,7 +204,7 @@ def extract(
     assert O >= 1, f"Error: value of O={O} is < 1"
     assert P >= K, f"Error: value of P={P} is < K"
     space = set(range(N))
-    pop = np.array([np.arange(S) for _ in range(P)])
+    pop = np.array([np.random.choice(list(space), size=S, replace=False) for _ in range(P)])
     fitnesses = np.zeros(P)
 
     stats = defaultdict(list)
