@@ -23,7 +23,7 @@ def test_min_subset():
             distances[i, j] = -1
 
     print()
-    best, stats = extract(distances, P=200, S=S, K=50, M=3, O=2, its=3_000)
+    best, stats = extract(distances, P=200, S=S, K=50, M=3, R=0.95, O=2, its=3_000)
     # print("Final fit:", stats["fits"][-1])
 
     # import matplotlib.pyplot as plt
